@@ -17,7 +17,7 @@ from urllib import request
 from selenium.webdriver.chrome.service import Service as ChromiumService
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.os_manager import ChromeType
-import chromedriver_autoinstaller
+from webdriver_manager.firefox import GeckoDriverManager
 
 
 class twAuto:
@@ -30,6 +30,7 @@ class twAuto:
     chrome_options.add_experimental_option(
         "excludeSwitches", ["enable-logging"])
 
+    firefox_options = webdriver.FirefoxOptions()
     def __init__(
         self,
         password="",
@@ -37,6 +38,7 @@ class twAuto:
         email="",
         headless=True,
         debugMode=False,
+        useFirefox=False,
         chromeDriverMode="auto", #manual or auto
         driverPath = "./chrome.exe", #if you use manual, pass the driverPath
         pathType = "testId", #xPath or testId
@@ -51,8 +53,10 @@ class twAuto:
         self.headless = headless
         self.debugMode = debugMode
         self.createCookies = createCookies
+        self.useFirefox = useFirefox
         if headless:
             twAuto.chrome_options.add_argument('--headless')
+            twAuto.firefox_options.add_argument('--headless')
         if debugMode:
             print("twAuto started.")
 
@@ -60,15 +64,21 @@ class twAuto:
     def start(self):
         print("Starting twAuto...")
         try:
-            if self.chromeDriverMode == "auto":
-                print("Downloading Chrome Driver...")
-                #chromedriver_autoinstaller.install() 
-
-                twAuto.driver = webdriver.Chrome(ChromeDriverManager().install(), options=twAuto.chrome_options)
-                print("Chrome Driver Downloaded Successfully")
+            if self.useFirefox:
+                if self.chromeDriverMode == "auto":
+                    print("Using Firefox Driver from the path: "+self.driverPath)
+                    twAuto.driver = webdriver.Firefox(executable_path=self.driverPath, options=twAuto.firefox_options)
+                else:
+                    twAuto.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install(),
+                                                      options=twAuto.firefox_options)
             else:
-                print("Using Chrome Driver from the path: "+self.driverPath)
-                twAuto.driver = webdriver.Chrome(self.driverPath, options=twAuto.chrome_options)
+                if self.chromeDriverMode == "auto":
+                    print("Downloading Chrome Driver...")
+                    twAuto.driver = webdriver.Chrome(ChromeDriverManager().install(), options=twAuto.chrome_options)
+                    print("Chrome Driver Downloaded Successfully")
+                else:
+                    print("Using Chrome Driver from the path: "+self.driverPath)
+                    twAuto.driver = webdriver.Chrome(self.driverPath, options=twAuto.chrome_options)
         except Exception as e:
             if self.debugMode:
                 print("twAuto Error: ", e)
