@@ -232,9 +232,10 @@ class twAuto:
 
         if self.pathType == "testId":
             try:
+                tweet_button_xpath = '//button[@data-testid="tweetButton"]'
                 try:
                     wait = WebDriverWait(twAuto.driver, 120)
-                    wait.until(EC.presence_of_element_located((By.XPATH, '//div[@data-testid="tweetButton"]')))
+                    wait.until(EC.presence_of_element_located((By.XPATH, tweet_button_xpath)))
                     
                 except TimeoutException:
                     print('Couldnt tweet.' )
@@ -249,7 +250,7 @@ class twAuto:
                     element.send_keys(imgpath)
                 
                 #find tweet button
-                tweetButton = twAuto.driver.find_element(By.XPATH, '//div[@data-testid="tweetButton"]')
+                tweetButton = twAuto.driver.find_element(By.XPATH, tweet_button_xpath)
                 
                 #click tweet button
                 twAuto.driver.execute_script("arguments[0].click()", tweetButton)
